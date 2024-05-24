@@ -1,0 +1,5 @@
+streamlit
+tensorflow==2.4.0
+tensorflow-federated==0.18.0
+pandas
+matplotlib
