@@ -1,5 +1,15 @@
+# Python cache files
 __pycache__/
-*.pyc
-*.pkl
-.DS_Store
+*.py[cod]
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Environment variables
+.env
+
+# Streamlit logs
 logs.txt
+
+# Model weights
+*.pkl
