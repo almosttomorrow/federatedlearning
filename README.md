@@ -1,47 +1,46 @@
-# Federated Learning Simulation
+# Federated Learning Prototype with Homomorphic Encryption and LLM Explanations
 
-This project demonstrates a federated learning simulation using TensorFlow and Streamlit. The application simulates three banks creating synthetic fraud data, training local models, and aggregating model weights to form a global model.
+## Introduction
+This repository contains a prototype implementation of federated learning using homomorphic encryption and an LLM to generate explanations. The prototype demonstrates how multiple entities can collaboratively train a machine learning model without sharing raw data, ensuring privacy and security.
 
-## Features
+## Key Features
+- **Federated Learning**: Train models locally and aggregate weights on a central server.
+- **Homomorphic Encryption**: Securely encrypt model weights during aggregation.
+- **LLM Explanations**: Generate natural language explanations using OpenAI's API.
 
-- Create synthetic fraud data for three banks
-- Train local models using TensorFlow
-- Visualize model weights
-- Aggregate model weights to form a global model
-- Download the global model
+## Technologies Used
+- **Google Colab**: Cloud-based Jupyter notebook environment.
+- **TensorFlow**: Machine learning framework.
+- **TenSEAL**: Library for homomorphic encryption on tensors.
+- **Streamlit**: Framework for interactive web applications.
+- **OpenAI**: API for generating natural language explanations.
 
-## Installation
-
+## Setup
 1. Clone the repository:
     ```bash
     git clone https://github.com/almosttomorrow/federatedlearning.git
-    cd federatedlearning
     ```
-
-2. Install the dependencies:
+2. Install the required packages:
     ```bash
     pip install -r requirements.txt
     ```
-
-## Usage
-
-1. Run the Streamlit app:
+3. Run the Streamlit app:
     ```bash
     streamlit run app.py
     ```
 
-2. Follow the UI to create synthetic data, train models, and aggregate model weights.
+## Usage
+1. Create synthetic fraud data for multiple banks.
+2. Train local models on the synthetic data.
+3. Encrypt the model weights using homomorphic encryption.
+4. Aggregate encrypted weights and update the global model.
+5. Generate explanations using an LLM.
 
-## Files
-
-- `app.py`: Main application script.
-- `requirements.txt`: List of dependencies.
-- `README.md`: Project documentation.
-
-## Contributing
-
-Feel free to fork this repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
+## File Structure
+- `app.py`: Main application code.
+- `requirements.txt`: List of required Python packages.
+- `.gitignore`: Files and directories to be ignored by Git.
+- `README.md`: This readme file.
 
 ## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
