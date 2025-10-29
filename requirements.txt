@@ -1,8 +1,23 @@
-streamlit
-tensorflow
-seaborn
-openai
-matplotlib
-pandas
-tenseal
-localtunnel
+# Core ML and Scientific Computing
+tensorflow>=2.13.0,<3.0.0
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0,<3.0.0
+
+# Visualization
+matplotlib>=3.7.0,<4.0.0
+seaborn>=0.12.0,<1.0.0
+
+# Streamlit for UI
+streamlit>=1.28.0,<2.0.0
+
+# Homomorphic Encryption
+tenseal>=0.3.14,<1.0.0
+
+# OpenAI API
+openai>=1.0.0,<2.0.0
+
+# Environment Management
+python-dotenv>=1.0.0,<2.0.0
+
+# Networking (optional - for tunnel/deployment)
+localtunnel>=2.0.2,<3.0.0

@@ -1,15 +1,44 @@
 # Python cache files
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
 
 # Environment variables
 .env
+.env.local
 
-# Streamlit logs
+# Streamlit logs and cache
 logs.txt
+.streamlit/
 
-# Model weights
+# Model weights and data files
 *.pkl
+*_features.csv
+*_labels.csv
+global_model_weights.pkl
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
