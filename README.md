@@ -106,13 +106,37 @@ All configuration is managed through environment variables. See `.env.example` f
 
 ## Usage
 
-### Running the Application
+### Option 1: Running Locally
 
 ```bash
 streamlit run app.py
 ```
 
 The application will open in your default web browser at `http://localhost:8501`.
+
+### Option 2: Running in Google Colab
+
+**🚀 Quick Start:** Open the pre-made notebook directly in Colab:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/almosttomorrow/federatedlearning/blob/main/Federated_Learning_Colab.ipynb)
+
+**Or follow the manual setup:**
+
+See [COLAB_SETUP.md](COLAB_SETUP.md) for detailed step-by-step instructions.
+
+**Quick Summary:**
+1. Open the notebook in Colab
+2. Install dependencies: `!pip install streamlit tensorflow numpy pandas matplotlib seaborn tenseal openai python-dotenv pyngrok`
+3. Clone repo: `!git clone https://github.com/almosttomorrow/federatedlearning.git`
+4. Set API key (optional) using the code in the notebook
+5. Run the app with ngrok tunnel
+6. Click the public URL to access the app
+
+**Benefits of Colab:**
+- No local installation required
+- Free GPU/TPU access (though CPU is sufficient)
+- Pre-configured environment
+- Easy sharing and collaboration
 
 ### Workflow Steps
 
