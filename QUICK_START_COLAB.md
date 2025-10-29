@@ -40,7 +40,8 @@ Go to [colab.research.google.com](https://colab.research.google.com) and create 
 
 ```python
 # Install and setup (2-3 minutes)
-!pip install -q streamlit tensorflow numpy pandas matplotlib seaborn tenseal openai python-dotenv pyngrok
+!pip install -q streamlit tensorflow numpy pandas matplotlib seaborn tenseal openai python-dotenv
+!npm install -g localtunnel
 
 # Clone repo
 !git clone https://github.com/almosttomorrow/federatedlearning.git
@@ -54,22 +55,39 @@ if api_key:
     with open('.env', 'w') as f:
         f.write(f'OPENAI_API_KEY={api_key}\n')
 
-# Run app
+# Run app with localtunnel
 import subprocess
-from pyngrok import ngrok
 import time
+import threading
 
 !pkill -9 streamlit
-process = subprocess.Popen(['streamlit', 'run', 'app.py', '--server.port', '8501'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-time.sleep(5)
-url = ngrok.connect(8501)
-print(f"\n\n🎉 App URL: {url}\n\n")
+process = subprocess.Popen(['streamlit', 'run', 'app.py', '--server.port', '8501', '--server.headless', 'true'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+time.sleep(10)
+
+lt_process = subprocess.Popen(['lt', '--port', '8501'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+def read_url():
+    for line in iter(lt_process.stdout.readline, ''):
+        if 'your url is:' in line.lower():
+            url = line.split('is:')[-1].strip()
+            print(f"\n\n🎉 App URL: {url}\n\n")
+            print("Note: You may need to click 'Click to Continue' on the warning page\n")
+            break
+
+url_thread = threading.Thread(target=read_url)
+url_thread.start()
+url_thread.join(timeout=30)
 process.wait()
 ```
 
 ### Step 3: Run the Cell
 
 Click the play button or press `Shift + Enter`
+
+**Alternative: If localtunnel doesn't work, use ngrok:**
+1. Sign up for free at https://dashboard.ngrok.com/signup
+2. Get your authtoken at https://dashboard.ngrok.com/get-started/your-authtoken
+3. See the notebook Step 5 for ngrok setup code
 
 ---
 
@@ -111,12 +129,20 @@ Use the **sidebar** to adjust settings (number of banks, samples, epochs).
 **App won't start?**
 ```python
 !pkill -9 streamlit
+!pkill -9 node
 # Wait 10 seconds, then re-run
 ```
 
 **URL not working?**
-- Copy and paste manually
+- Click "Click to Continue" on the warning page
+- Copy and paste URL manually
 - Try incognito mode
+- Use ngrok method instead (see notebook Step 5)
+
+**ngrok authentication error?**
+- Sign up at https://dashboard.ngrok.com/signup
+- Get your free authtoken
+- Use Step 5 in the notebook
 
 **Memory error?**
 - Use 2 banks instead of 3

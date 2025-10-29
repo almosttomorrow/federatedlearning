@@ -36,7 +36,10 @@ Run this in a code cell:
 ```python
 %%capture
 # Install all required packages (takes 2-3 minutes)
-!pip install streamlit tensorflow numpy pandas matplotlib seaborn tenseal openai python-dotenv pyngrok
+!pip install streamlit tensorflow numpy pandas matplotlib seaborn tenseal openai python-dotenv
+
+# Install localtunnel for creating public URLs (no authentication required)
+!npm install -g localtunnel
 ```
 
 ### Step 3: Clone the Repository
@@ -73,40 +76,61 @@ else:
 
 **Get your API key:** https://platform.openai.com/api-keys
 
-### Step 5: Run the Streamlit App
+### Step 5: Run the Streamlit App with Localtunnel
+
+**Option A: Using localtunnel (No signup required - Recommended)**
 
 Run this in a new code cell:
 
 ```python
 import subprocess
-from pyngrok import ngrok
 import time
+import threading
 
-# Kill any existing Streamlit processes
+# Kill any existing processes
 !pkill -9 streamlit
 
 # Start Streamlit in the background
 print("Starting Streamlit app...")
 streamlit_process = subprocess.Popen(
-    ['streamlit', 'run', 'app.py', '--server.port', '8501'],
+    ['streamlit', 'run', 'app.py', '--server.port', '8501', '--server.headless', 'true'],
     stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE
+    stderr=subprocess.PIPE,
+    text=True
 )
 
 # Wait for Streamlit to start
-time.sleep(5)
+print("Waiting for Streamlit to initialize...")
+time.sleep(10)
 
-# Create ngrok tunnel
-print("Creating public URL...\n")
-public_url = ngrok.connect(8501)
+# Start localtunnel
+print("Creating public URL with localtunnel...\n")
+lt_process = subprocess.Popen(
+    ['lt', '--port', '8501'],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    text=True
+)
 
-print("="*70)
-print("🎉 Streamlit app is running!")
-print("="*70)
-print(f"\n📱 Access your app at: {public_url}\n")
-print("="*70)
-print("\n⚠️  Keep this cell running! Stop it to shut down the app.\n")
-print("💡 Tip: Click the URL above to open the app in a new tab.\n")
+# Read the URL from localtunnel output
+def read_url():
+    for line in iter(lt_process.stdout.readline, ''):
+        if 'your url is:' in line.lower():
+            url = line.split('is:')[-1].strip()
+            print("\n" + "="*70)
+            print("🎉 Streamlit app is running!")
+            print("="*70)
+            print(f"\n📱 Access your app at: {url}\n")
+            print("="*70)
+            print("\n⚠️  Important Notes:")
+            print("   - Keep this cell running! Stop it to shut down the app.")
+            print("   - You may see a warning page - click 'Click to Continue'")
+            print("   - If the URL doesn't work, try Option B below\n")
+            break
+
+url_thread = threading.Thread(target=read_url)
+url_thread.start()
+url_thread.join(timeout=30)
 
 # Keep the cell running
 try:
@@ -114,12 +138,75 @@ try:
 except KeyboardInterrupt:
     print("\n🛑 Shutting down...")
     streamlit_process.terminate()
-    ngrok.kill()
+    lt_process.terminate()
+```
+
+**Option B: Using ngrok (Requires free signup)**
+
+If localtunnel doesn't work, use ngrok instead:
+
+1. **Sign up** at https://dashboard.ngrok.com/signup
+2. **Get your authtoken** at https://dashboard.ngrok.com/get-started/your-authtoken
+3. **Run this code:**
+
+```python
+# Install pyngrok
+!pip install -q pyngrok
+
+import subprocess
+from pyngrok import ngrok, conf
+from getpass import getpass
+import time
+
+# Get ngrok authtoken
+print("Get your free ngrok authtoken from: https://dashboard.ngrok.com/get-started/your-authtoken\n")
+authtoken = getpass("Enter your ngrok authtoken: ")
+
+if authtoken:
+    # Set the authtoken
+    conf.get_default().auth_token = authtoken
+
+    # Kill any existing Streamlit processes
+    !pkill -9 streamlit
+
+    # Start Streamlit
+    print("\nStarting Streamlit app...")
+    streamlit_process = subprocess.Popen(
+        ['streamlit', 'run', 'app.py', '--server.port', '8501', '--server.headless', 'true'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+    # Wait for Streamlit to start
+    time.sleep(10)
+
+    # Create ngrok tunnel
+    print("Creating public URL...\n")
+    public_url = ngrok.connect(8501)
+
+    print("="*70)
+    print("🎉 Streamlit app is running!")
+    print("="*70)
+    print(f"\n📱 Access your app at: {public_url}\n")
+    print("="*70)
+    print("\n⚠️  Keep this cell running! Stop it to shut down the app.\n")
+
+    # Keep the cell running
+    try:
+        streamlit_process.wait()
+    except KeyboardInterrupt:
+        print("\n🛑 Shutting down...")
+        streamlit_process.terminate()
+        ngrok.kill()
+else:
+    print("⚠️ No authtoken provided. Please get one from https://dashboard.ngrok.com/signup")
 ```
 
 ### Step 6: Access the App
 
-1. **Wait** for the ngrok URL to appear (looks like: `https://xxxx-xx-xx-xx-xx.ngrok-free.app`)
+1. **Wait** for the URL to appear
+   - Localtunnel: `https://xxxx.loca.lt`
+   - ngrok: `https://xxxx-xx-xx-xx-xx.ngrok-free.app`
 2. **Click** the URL to open the app in a new tab
 3. **Use** the app through the Streamlit interface
 
@@ -173,10 +260,9 @@ Adjust these parameters before generating data:
 
 **Option 2: Run a stop cell**
 ```python
-# Stop Streamlit and ngrok
+# Stop all processes
 !pkill -9 streamlit
-from pyngrok import ngrok
-ngrok.kill()
+!pkill -9 node  # Stops localtunnel
 print("✓ App stopped successfully!")
 ```
 
@@ -244,13 +330,19 @@ time.sleep(10)
 # Re-run the "Run the Streamlit App" cell
 ```
 
-### Issue: ngrok URL not working
+### Issue: Tunnel URL not working
 
-**Solutions:**
-1. Copy the URL manually and paste in a new browser tab
-2. Try incognito/private browsing mode
-3. Check if your company/school network blocks ngrok
-4. Try a different browser
+**For localtunnel:**
+1. Click "Click to Continue" on the warning page
+2. Copy the URL manually and paste in a new browser tab
+3. Try incognito/private browsing mode
+4. If still not working, use ngrok method instead
+
+**For ngrok:**
+1. Make sure you entered your authtoken correctly
+2. Sign up at https://dashboard.ngrok.com/signup if you haven't
+3. Get authtoken from https://dashboard.ngrok.com/get-started/your-authtoken
+4. Check if your company/school network blocks ngrok
 
 ### Issue: LLM explanations not working
 
